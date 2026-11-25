@@ -4,8 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-with open('texto_recebido.txt', 'r', encoding='utf-8') as arquivo:
-    conteudo = arquivo.read().strip()
+conteudo=input('Digite o texto para verificação :').strip()
 
 if not conteudo:
     print('Texto para leitura está vazio!')
@@ -22,7 +21,8 @@ else:
         f'{conteudo}'
     )
     dados = {'contents':[{'parts':[{'text':prompt}]}],
-             'generationConfig': {'maxOutputTokens': 1000}}
+             'generationConfig': {'maxOutputTokens': 1000
+             }}
 
     resposta = requests.post(url, headers=headers, json=dados).json()
 
