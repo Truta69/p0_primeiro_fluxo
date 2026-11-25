@@ -1,1 +1,3 @@
-# p0_primeiro_fluxo
+Este aplicativo, feito em Python, recebe um texto pelo terminal e verifica indícios de que pode se tratar de um texto fake.
+O arquivo leitor.py é o arquivo principal do projeto. O requirements.txt é o lugar onde as bibliotecas do projeto ficam, e o .env.example é o arquivo com as configurações necessárias para o projeto.
+Para executar o app: faça o clone do repositório do GitHub, https://github.com/Truta69/p0_primeiro_fluxo. Depois, na pasta salva, abra-a pelo Git Bash (ou terminal do VS Code) e configure o ambiente virtual para a execução do app com "python -m venv venv". Por fim, instale os pacotes (pip install -r requirements.txt), crie o .env baseado no .env.example e rode python leitor.py.
