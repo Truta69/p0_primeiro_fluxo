@@ -5,16 +5,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def analisar_texto(texto_usuario):
-    url=os.getenv("LLM_API_URL","").strip()
-    chave=os.getenv("LLM_API_KEY","").strip()
-    if not url or not url.startswith("http"):       
+    url = os.getenv("LLM_API_URL", "").strip()
+    chave = os.getenv("LLM_API_KEY", "").strip()
+    if not url or not url.startswith("http"):
         return {"erro": "URL da API não encontrada ou inválida."}
     if not chave:
         return {"erro": "Chave da API não encontrada."}
     url = os.getenv("LLM_API_URL")
     headers = {"x-goog-api-key": os.getenv("LLM_API_KEY")}
-    
+
     prompt = f"""
     Analise a seguinte mensagem para identificar possíveis golpes, fraudes ou fake news.
     Responda estritamente no formato JSON com estas chaves exatas:
@@ -28,26 +29,36 @@ def analisar_texto(texto_usuario):
 
     dados = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json"}
+        "generationConfig": {"responseMimeType": "application/json"},
     }
 
     try:
-        resposta = requests.post(url, headers=headers, json=dados,timeout=10)
+        resposta = requests.post(url, headers=headers, json=dados, timeout=10)
         if resposta.status_code in [400, 401, 403]:
-                return {"erro": f"Credencial inválida ou sem permissão (código {resposta.status_code}). Verifique a LLM_API_KEY no arquivo .env."}
-        if resposta.status_code==503:
-            return {"erro": "Serviço indisponível (código 503). Tente novamente mais tarde."}
+            return {
+                "erro": f"Credencial inválida ou sem permissão (código {resposta.status_code}). Verifique a LLM_API_KEY no arquivo .env."
+            }
+        if resposta.status_code == 503:
+            return {
+                "erro": "Serviço indisponível (código 503). Tente novamente mais tarde."
+            }
         resposta_json = resposta.json()
         if "candidates" in resposta_json:
-            texto_ia = resposta_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+            texto_ia = resposta_json["candidates"][0]["content"]["parts"][0][
+                "text"
+            ].strip()
             if not texto_ia:
                 return {"erro": "A resposta da API está vazia."}
             return json.loads(texto_ia)
         else:
             return {"erro": f"Aviso do servidor: {resposta_json}"}
     except requests.exceptions.Timeout:
-        return {"erro": "Tempo de resposta da API excedido. Tente novamente mais tarde."}
+        return {
+            "erro": "Tempo de resposta da API excedido. Tente novamente mais tarde."
+        }
     except json.JSONDecodeError:
-        return {"erro": "Falha ao decodificar a resposta da API. A resposta não está no formato JSON esperado."}
+        return {
+            "erro": "Falha ao decodificar a resposta da API. A resposta não está no formato JSON esperado."
+        }
     except Exception as e:
         return {"erro": f"Falha na comunicação com a API: {e}"}

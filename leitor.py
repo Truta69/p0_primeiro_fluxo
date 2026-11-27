@@ -14,7 +14,7 @@ else:
     else:
         print(f"Classificação: {analise.get('classificacao')}")
         print(f"Nível de Risco: {analise.get('nivel_risco')}/10")
-        
+
         sinais = analise.get("sinais_alerta", [])
         if sinais:
             print("Sinais de Alerta:")
@@ -22,5 +22,5 @@ else:
                 print(f"  - {sinal}")
         else:
             print("Sinais de Alerta: Nenhum identificado.")
-            
+
         print(f"Explicação: {analise.get('explicacao')}")
