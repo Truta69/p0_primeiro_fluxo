@@ -33,10 +33,11 @@ def analisar_texto(texto_usuario):
 
     try:
         resposta = requests.post(url, headers=headers, json=dados)
-        resposta_json = resposta.json()
         if resposta.status_code in [400, 401, 403]:
                 return {"erro": f"Credencial inválida ou sem permissão (código {resposta.status_code}). Verifique a LLM_API_KEY no arquivo .env."}
-
+        if resposta.status_code==503:
+            return {"erro": "Serviço indisponível (código 503). Tente novamente mais tarde."}
+        resposta_json = resposta.json()
         if "candidates" in resposta_json:
             texto_ia = resposta_json["candidates"][0]["content"]["parts"][0]["text"]
             return json.loads(texto_ia)
