@@ -6,6 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def analisar_texto(texto_usuario):
+    url=os.getenv("LLM_API_URL","").strip()
+    chave=os.getenv("LLM_API_KEY","").strip()
+    if not url or not url.startswith("http"):       
+        return {"erro": "URL da API não encontrada ou inválida."}
+    if not chave:
+        return {"erro": "Chave da API não encontrada."}
     url = os.getenv("LLM_API_URL")
     headers = {"x-goog-api-key": os.getenv("LLM_API_KEY")}
     
