@@ -32,7 +32,7 @@ def analisar_texto(texto_usuario):
     }
 
     try:
-        resposta = requests.post(url, headers=headers, json=dados)
+        resposta = requests.post(url, headers=headers, json=dados,timeout=10)
         if resposta.status_code in [400, 401, 403]:
                 return {"erro": f"Credencial inválida ou sem permissão (código {resposta.status_code}). Verifique a LLM_API_KEY no arquivo .env."}
         if resposta.status_code==503:
@@ -43,6 +43,7 @@ def analisar_texto(texto_usuario):
             return json.loads(texto_ia)
         else:
             return {"erro": f"Aviso do servidor: {resposta_json}"}
-            
+    except requests.exceptions.Timeout:
+        return {"erro": "Tempo de resposta da API excedido. Tente novamente mais tarde."}
     except Exception as e:
         return {"erro": f"Falha na comunicação com a API: {e}"}
