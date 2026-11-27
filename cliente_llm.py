@@ -1,16 +1,39 @@
 import os
+import json
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-url = os.getenv("LLM_API_URL")
-headers = {"x-goog-api-key": os.getenv("LLM_API_KEY")}
-dados = {"contents": [{"parts": [{"text": "Cite seis palavras que podem indicar uma fake news?"}]}]}
+def analisar_texto(texto_usuario):
+    url = os.getenv("LLM_API_URL")
+    headers = {"x-goog-api-key": os.getenv("LLM_API_KEY")}
+    
+    prompt = f"""
+    Analise a seguinte mensagem para identificar possíveis golpes, fraudes ou fake news.
+    Responda estritamente no formato JSON com estas chaves exatas:
+    - "classificacao": ("Golpe ou Fake News", "Suspeito" ou "Seguro")
+    - "nivel_risco": (número inteiro de 0 a 10)
+    - "sinais_alerta": (lista de strings com os motivos; se não houver, lista vazia [])
+    - "explicacao": (resumo claro e direto em português)
 
-resposta = requests.post(url, headers=headers, json=dados).json()
+    Mensagem: {texto_usuario}
+    """
 
-if "candidates" in resposta:
-    print(resposta["candidates"][0]["content"]["parts"][0]["text"])
-else:
-    print("Aviso do servidor:", resposta)
+    dados = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"responseMimeType": "application/json"}
+    }
+
+    try:
+        resposta = requests.post(url, headers=headers, json=dados)
+        resposta_json = resposta.json()
+
+        if "candidates" in resposta_json:
+            texto_ia = resposta_json["candidates"][0]["content"]["parts"][0]["text"]
+            return json.loads(texto_ia)
+        else:
+            return {"erro": f"Aviso do servidor: {resposta_json}"}
+            
+    except Exception as e:
+        return {"erro": f"Falha na comunicação com a API: {e}"}
