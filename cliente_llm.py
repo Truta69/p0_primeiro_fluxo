@@ -39,11 +39,15 @@ def analisar_texto(texto_usuario):
             return {"erro": "Serviço indisponível (código 503). Tente novamente mais tarde."}
         resposta_json = resposta.json()
         if "candidates" in resposta_json:
-            texto_ia = resposta_json["candidates"][0]["content"]["parts"][0]["text"]
+            texto_ia = resposta_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+            if not texto_ia:
+                return {"erro": "A resposta da API está vazia."}
             return json.loads(texto_ia)
         else:
             return {"erro": f"Aviso do servidor: {resposta_json}"}
     except requests.exceptions.Timeout:
         return {"erro": "Tempo de resposta da API excedido. Tente novamente mais tarde."}
+    except json.JSONDecodeError:
+        return {"erro": "Falha ao decodificar a resposta da API. A resposta não está no formato JSON esperado."}
     except Exception as e:
         return {"erro": f"Falha na comunicação com a API: {e}"}
